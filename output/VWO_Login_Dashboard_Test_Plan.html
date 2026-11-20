@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QA test plan for the VWO Login Dashboard based on the supplied product requirements document.">
+  <title>VWO Login Dashboard — Test Plan</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17233b;
+      --muted: #53627a;
+      --brand: #4a43d3;
+      --brand-dark: #302ba4;
+      --line: #dce3ee;
+      --surface: #f5f7fb;
+      --surface-strong: #e9edfb;
+      --green: #157347;
+      --amber: #8a5700;
+      --red: #a52a2a;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: #eef1f7;
+      color: var(--ink);
+      font: 15px/1.6 "Segoe UI", Arial, sans-serif;
+    }
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 32px auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 12px 36px rgba(27, 40, 70, .08);
+      overflow: hidden;
+    }
+    header {
+      padding: 48px 56px 38px;
+      color: #fff;
+      background: linear-gradient(125deg, #292675, #5149db 68%, #796ff0);
+    }
+    header .eyebrow {
+      margin: 0 0 10px;
+      color: #d8d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 44px); line-height: 1.15; }
+    header .subtitle { max-width: 720px; margin: 15px 0 0; color: #eeeefe; font-size: 17px; }
+    .metadata {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .metadata div {
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+    }
+    .metadata strong { display: block; color: #d8d6ff; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .metadata span { display: block; margin-top: 4px; font-size: 14px; }
+    nav {
+      padding: 15px 56px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+    nav a { display: inline-block; margin: 4px 14px 4px 0; color: var(--brand-dark); font-size: 13px; font-weight: 600; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    main { padding: 14px 56px 56px; }
+    section { padding-top: 30px; scroll-margin-top: 18px; }
+    h2 { margin: 0 0 14px; padding-bottom: 9px; border-bottom: 2px solid var(--surface-strong); color: #242d53; font-size: 23px; }
+    h3 { margin: 22px 0 9px; color: #343c66; font-size: 17px; }
+    p { margin: 8px 0 12px; }
+    ul, ol { margin: 8px 0 14px; padding-left: 23px; }
+    li { margin: 4px 0; }
+    .callout {
+      margin: 16px 0;
+      padding: 14px 17px;
+      border-left: 4px solid var(--brand);
+      border-radius: 5px;
+      background: #f2f1ff;
+    }
+    .callout.warning { border-left-color: #bf8015; background: #fff8e9; }
+    .callout p:last-child { margin-bottom: 0; }
+    .muted { color: var(--muted); }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--surface-strong);
+      color: #37317d;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    table { width: 100%; margin: 12px 0 20px; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 11px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #f0f2fa; color: #293254; font-weight: 700; }
+    tbody tr:nth-child(even) { background: #fbfcfe; }
+    .case-table { table-layout: fixed; }
+    .case-table th:nth-child(1) { width: 10%; }
+    .case-table th:nth-child(2) { width: 13%; }
+    .case-table th:nth-child(3) { width: 24%; }
+    .case-table th:nth-child(4) { width: 29%; }
+    .case-table th:nth-child(5) { width: 24%; }
+    .priority-high { color: var(--red); font-weight: 700; }
+    .priority-medium { color: var(--amber); font-weight: 700; }
+    .priority-low { color: var(--green); font-weight: 700; }
+    .status { color: var(--muted); font-style: italic; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { padding: 16px 18px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+    .card h3 { margin-top: 0; }
+    footer { padding: 20px 56px; border-top: 1px solid var(--line); background: #fbfcfe; color: var(--muted); font-size: 12px; }
+    @media (max-width: 760px) {
+      header { padding: 34px 24px 28px; }
+      nav { padding: 12px 24px; }
+      main { padding: 8px 24px 36px; }
+      footer { padding: 18px 24px; }
+      .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .two-col { grid-template-columns: 1fr; }
+      .case-table { table-layout: auto; }
+      .case-table th, .case-table td { min-width: 125px; }
+      .case-table { display: block; overflow-x: auto; }
+    }
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      body { background: #fff; font-size: 10pt; }
+      .page { width: 100%; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+      header { padding: 24px 30px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      nav { display: none; }
+      main { padding: 0 30px 24px; }
+      section { padding-top: 18px; }
+      h2, h3 { break-after: avoid; }
+      table { font-size: 8.5pt; }
+      tr, .card, .callout { break-inside: avoid; }
+      thead { display: table-header-group; }
+      footer { padding: 14px 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <p class="eyebrow">Quality Assurance · Test Planning</p>
+      <h1>VWO Login Dashboard</h1>
+      <p class="subtitle">Test plan for the login entry point, authentication and recovery journeys, user experience, accessibility, security, integrations, and non-functional requirements described in the supplied PRD.</p>
+      <div class="metadata" aria-label="Document information">
+        <div><strong>Document</strong><span>Test Plan</span></div>
+        <div><strong>Version</strong><span>1.0</span></div>
+        <div><strong>Source</strong><span>Supplied VWO Login Dashboard PRD</span></div>
+        <div><strong>Status</strong><span>Draft — review and approval pending</span></div>
+      </div>
+    </header>
+    <nav aria-label="Table of contents">
+      <a href="#objective">Objective</a>
+      <a href="#scope">Scope</a>
+      <a href="#coverage">Coverage</a>
+      <a href="#environment">Environments</a>
+      <a href="#strategy">Strategy</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#criteria">Criteria</a>
+      <a href="#risks">Risks</a>
+      <a href="#approvals">Approvals</a>
+    </nav>
+
+    <main>
+      <section id="objective">
+        <h2>1. Objective</h2>
+        <p>Verify that the VWO Login Dashboard provides a secure, reliable, responsive, accessible, and understandable entry point to the VWO platform. Testing will check the stated login and recovery journeys, account access options, session behavior, user-facing validation and feedback, integration handoffs, and measurable performance and availability requirements.</p>
+        <p>The plan is based solely on the supplied PRD. It is intended to identify deviations from those requirements before release and to provide evidence for release readiness.</p>
+        <div class="callout">
+          <strong>PRD targets to verify</strong>
+          <ul>
+            <li>Login page load time: within 2 seconds on standard connections.</li>
+            <li>Login success rate: target of 95% or higher.</li>
+            <li>Login-experience satisfaction: target of 90% or higher.</li>
+            <li>Service availability: 99.9% uptime target.</li>
+            <li>Login-related support tickets: target reduction of 20%.</li>
+            <li>Security: no successful brute-force or unauthorized access; no unauthorized session hijacking.</li>
+          </ul>
+          <p class="muted">Measurement windows, data sources, calculation rules, and baselines for these targets are not specified and require stakeholder confirmation.</p>
+        </div>
+      </section>
+
+      <section id="scope">
+        <h2>2. Scope</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>In scope</h3>
+            <ul>
+              <li>Login page presentation, branding, announcements, and light/dark theme choices.</li>
+              <li>Email and password login, input validation, authentication outcomes, loading and success feedback.</li>
+              <li>Remember Me, session lifecycle and configurable timeout behavior.</li>
+              <li>Forgot-password and email-based account recovery, including secure reset-token behavior.</li>
+              <li>Password requirements and strength feedback where presented in the relevant password flow.</li>
+              <li>Optional 2FA, enterprise SSO (including SAML/OAuth), and social identity-provider options when enabled for the test account/environment.</li>
+              <li>Responsive behavior, keyboard operation, screen-reader support, high contrast, and WCAG 2.1 AA assessment.</li>
+              <li>HTTPS enforcement, protected authentication data, rate limiting, and session security.</li>
+              <li>Successful transition to the VWO dashboard and login success/failure analytics events.</li>
+              <li>Performance, concurrency, availability, and geographic behavior against the PRD targets.</li>
+              <li>Registration/free-trial path, login assistance/support handoff, and post-login context preservation as described in the PRD.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Out of scope / conditional</h3>
+            <ul>
+              <li>Testing the internal functionality of the VWO experimentation, personalization, and analytics products after authentication.</li>
+              <li>Deep functional validation of external identity-provider systems; verify only the VWO handoff and outcome unless separately agreed.</li>
+              <li>Biometric authentication, adaptive authentication, and PWA behavior: listed as future enhancements, not committed current scope.</li>
+              <li>Marketing campaign behavior and onboarding content beyond the login-to-registration and stated post-registration handoff.</li>
+              <li>Formal certification or legal determination of GDPR, CCPA, or enterprise compliance. QA can verify implemented behaviors and provide evidence; compliance approval remains with the responsible stakeholders.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout warning">
+          <strong>Scope decision required:</strong> The PRD mixes current-state features with proposed requirements, optional capabilities, and future enhancements. Confirm which features are implemented and enabled in the release under test. Conditional features will be marked Not Applicable only after product-owner confirmation.
+        </div>
+      </section>
+
+      <section id="coverage">
+        <h2>3. Test Coverage and Core Scenarios</h2>
+        <p>Priorities below are proposed from the PRD’s stated business and security objectives. <span class="priority-high">High</span> indicates release-critical access or security behavior; <span class="priority-medium">Medium</span> indicates important experience or integration behavior; <span class="priority-low">Low</span> indicates supporting polish or a lower-risk target. Final priorities are subject to product-owner approval.</p>
+
+        <h3>3.1 Authentication and account access</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>AUTH-01</td><td class="priority-high">High</td><td>Valid email and password</td><td>Submit valid credentials for an authorized test account.</td><td>Authentication succeeds; the user reaches the VWO dashboard with the intended account context.</td></tr>
+            <tr><td>AUTH-02</td><td class="priority-high">High</td><td>Invalid credentials</td><td>Try an unknown email, an incorrect password, and a mismatched credential pair.</td><td>Access is denied with a clear, actionable message that does not reveal sensitive account or authentication details.</td></tr>
+            <tr><td>AUTH-03</td><td class="priority-high">High</td><td>Required fields and submission</td><td>Submit with both fields empty and with either field missing.</td><td>Submission is blocked or rejected; required-field feedback identifies what needs attention.</td></tr>
+            <tr><td>AUTH-04</td><td class="priority-medium">Medium</td><td>Email format validation</td><td>Enter valid and malformed email values; move focus away from the field.</td><td>Validation occurs on blur and communicates an invalid format clearly without preventing valid formats.</td></tr>
+            <tr><td>AUTH-05</td><td class="priority-medium">Medium</td><td>Password visibility and input handling</td><td>Enter a password and inspect its presentation and submitted value.</td><td>Password handling follows the approved design; credentials are not exposed in the interface or error feedback.</td></tr>
+            <tr><td>AUTH-06</td><td class="priority-high">High</td><td>Authentication loading state</td><td>Submit credentials while observing the form during processing.</td><td>A clear loading state prevents ambiguous repeated submission; outcome feedback is shown when processing finishes.</td></tr>
+            <tr><td>AUTH-07</td><td class="priority-high">High</td><td>Successful-login confirmation and destination</td><td>Complete login from the entry page and any supported return destination.</td><td>Success is evident and navigation lands on the correct VWO destination without unintended loss of context.</td></tr>
+            <tr><td>AUTH-08</td><td class="priority-medium">Medium</td><td>Free-trial registration path</td><td>Follow the new-account/free-trial link from the login page.</td><td>The registration destination is reachable and the transition is clear.</td></tr>
+            <tr><td>AUTH-09</td><td class="priority-medium">Medium</td><td>Login assistance/support link</td><td>Use the available support or login-assistance path.</td><td>The support handoff works and provides the expected assistance route.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.2 Password recovery and session management</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>REC-01</td><td class="priority-high">High</td><td>Request password reset</td><td>Start recovery for an eligible account using the email-based reset flow.</td><td>Recovery instructions are sent through the approved channel; the response does not unnecessarily disclose account existence.</td></tr>
+            <tr><td>REC-02</td><td class="priority-high">High</td><td>Reset token validity and use</td><td>Use a valid reset token, then try it again and test invalid or expired states where configurable.</td><td>Only a valid token permits reset; tokens meet the configured lifetime and single-use rules; invalid states provide safe guidance.</td></tr>
+            <tr><td>REC-03</td><td class="priority-high">High</td><td>Password requirement enforcement</td><td>Submit passwords that meet and fail the published requirements in the reset flow.</td><td>Requirements are enforced consistently, and strength/requirement feedback is clear where specified.</td></tr>
+            <tr><td>REC-04</td><td class="priority-high">High</td><td>Login after password reset</td><td>Complete a reset and attempt login with the new and previous credentials.</td><td>The new password works; the previous password is rejected, subject to the product’s documented policy.</td></tr>
+            <tr><td>SES-01</td><td class="priority-high">High</td><td>Remember Me behavior</td><td>Sign in with Remember Me selected and unselected; close and reopen the browser/session as appropriate.</td><td>Persistence matches the product’s documented policy; unselected sessions do not persist beyond their intended lifecycle.</td></tr>
+            <tr><td>SES-02</td><td class="priority-high">High</td><td>Session timeout</td><td>Remain inactive through the configured timeout and try to resume protected access.</td><td>Timeout is enforced; expired access requires authentication and does not expose protected dashboard content.</td></tr>
+            <tr><td>SES-03</td><td class="priority-high">High</td><td>Session security and logout</td><td>End a session, then attempt to reuse the prior session state to access protected content.</td><td>Ended/invalidated session access is denied; session tokens are handled securely.</td></tr>
+            <tr><td>SES-04</td><td class="priority-medium">Medium</td><td>Recent activity/context preservation</td><td>Leave and return to the product using supported session behavior.</td><td>Context is preserved or restored according to the product’s intended session policy.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.3 Optional identity and enterprise flows</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>IDP-01</td><td class="priority-high">High</td><td>Optional 2FA</td><td>For an enabled account, complete valid and invalid second-factor steps, including recovery behavior if provided.</td><td>Access requires successful configured factors; failures are handled safely and clearly.</td></tr>
+            <tr><td>IDP-02</td><td class="priority-high">High</td><td>Enterprise SSO</td><td>Exercise enabled SAML/OAuth organizational login: successful handoff, cancellation, and failure return.</td><td>Successful SSO returns the correct user to VWO; failure/cancellation does not grant access and provides a useful next step.</td></tr>
+            <tr><td>IDP-03</td><td class="priority-medium">Medium</td><td>Social login, if enabled</td><td>Exercise the configured Google, Microsoft, or other enabled provider handoff and return states.</td><td>VWO handles success, denial, and provider error states without losing control of the login journey.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.4 UI, accessibility, and responsive behavior</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>UX-01</td><td class="priority-medium">Medium</td><td>Responsive layout</td><td>View and operate the page across supported desktop, tablet, and mobile viewports.</td><td>Content and controls remain readable, usable, and free of unintended clipping or overlap.</td></tr>
+            <tr><td>UX-02</td><td class="priority-medium">Medium</td><td>Touch-friendly controls</td><td>Use form fields, checkbox, links, and buttons on touch devices.</td><td>Interactive controls can be targeted and operated reliably.</td></tr>
+            <tr><td>UX-03</td><td class="priority-low">Low</td><td>Auto-focus and clickable labels</td><td>Load the page and activate labels by pointer and keyboard.</td><td>Initial focus follows the intended first-field behavior without disrupting accessibility; labels activate their associated controls.</td></tr>
+            <tr><td>UX-04</td><td class="priority-medium">Medium</td><td>Keyboard-only navigation</td><td>Navigate and submit all page controls without a pointer.</td><td>All interactive elements are reachable and operable in a logical order, with visible focus.</td></tr>
+            <tr><td>UX-05</td><td class="priority-high">High</td><td>Screen-reader semantics</td><td>Inspect names, roles, labels, validation messages, and status announcements using assistive technology.</td><td>Form fields and state changes are programmatically identifiable and announced appropriately.</td></tr>
+            <tr><td>UX-06</td><td class="priority-medium">Medium</td><td>Contrast and high-contrast mode</td><td>Check text, controls, focus, errors, and supported high-contrast presentation.</td><td>Content remains perceivable and operable; accessibility target is WCAG 2.1 AA.</td></tr>
+            <tr><td>UX-07</td><td class="priority-low">Low</td><td>Light/dark theme announcement</td><td>Verify the product-announcement banner and theme options stated in the current experience.</td><td>Announcement is visible and links/actions for available themes work as intended.</td></tr>
+            <tr><td>UX-08</td><td class="priority-medium">Medium</td><td>Branding and visual consistency</td><td>Review VWO logo, colors, typography, and login-page content against approved product design.</td><td>Page presents a consistent, professional VWO-branded experience.</td></tr>
+            <tr><td>UX-09</td><td class="priority-medium">Medium</td><td>Localization and specialized email keyboard</td><td>Verify any supported language configuration and email-field input mode on mobile devices.</td><td>Supported language settings render correctly; email entry presents the suitable mobile keyboard where applicable.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.5 Security, compliance evidence, and integrations</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>SEC-01</td><td class="priority-high">High</td><td>HTTPS enforcement</td><td>Open the login page and follow authentication-related navigation using supported entry paths.</td><td>Authentication traffic is protected by HTTPS; insecure access is not used to transmit credentials.</td></tr>
+            <tr><td>SEC-02</td><td class="priority-high">High</td><td>Credential and error-data protection</td><td>Inspect user-visible responses and approved test telemetry for credential exposure or sensitive detail.</td><td>Passwords, tokens, and sensitive account details are not exposed in page feedback or inappropriate client-visible output.</td></tr>
+            <tr><td>SEC-03</td><td class="priority-high">High</td><td>Rate limiting and repeated failures</td><td>Using an authorized test environment and agreed limits, verify throttling behavior after repeated failed attempts.</td><td>Configured rate limiting is enforced; users receive safe feedback and valid access is not unintentionally granted.</td></tr>
+            <tr><td>SEC-04</td><td class="priority-high">High</td><td>Unauthorized access and session misuse</td><td>Attempt protected access without authentication and with an expired or invalid session.</td><td>Protected access is denied; no unauthorized session access succeeds.</td></tr>
+            <tr><td>SEC-05</td><td class="priority-high">High</td><td>Stored password protection evidence</td><td>Review authorized security/configuration evidence for the stated industry-standard password hashing requirement.</td><td>Password storage uses the approved industry-standard hashing approach; raw passwords are not stored.</td></tr>
+            <tr><td>SEC-06</td><td class="priority-medium">Medium</td><td>Privacy and audit evidence</td><td>Review login-related data collection, consent/privacy behavior where present, and enterprise audit evidence.</td><td>Handling aligns with documented GDPR/CCPA and enterprise requirements; unresolved compliance evidence is escalated for owner sign-off.</td></tr>
+            <tr><td>INT-01</td><td class="priority-high">High</td><td>VWO dashboard handoff</td><td>Complete authentication from the supported login entry points.</td><td>Successful login transitions to the main dashboard with the correct authenticated user.</td></tr>
+            <tr><td>INT-02</td><td class="priority-medium">Medium</td><td>Login analytics events</td><td>Generate successful and failed login outcomes and inspect approved analytics records.</td><td>Success/failure events are accurately tracked without collecting prohibited secrets.</td></tr>
+            <tr><td>INT-03</td><td class="priority-medium">Medium</td><td>Support and onboarding handoffs</td><td>Follow the login assistance, registration, and stated onboarding paths.</td><td>Links route to the intended support or onboarding destination and give the user a clear next step.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>3.6 Performance, availability, and operational scenarios</h3>
+        <table class="case-table">
+          <thead><tr><th>ID</th><th>Priority</th><th>Scenario</th><th>Test outline</th><th>Expected result</th></tr></thead>
+          <tbody>
+            <tr><td>PERF-01</td><td class="priority-high">High</td><td>Login page load time</td><td>Measure page load under an agreed representative standard-connection profile.</td><td>Login page loads within the stated 2-second target; measurement definition and percentile are agreed before execution.</td></tr>
+            <tr><td>PERF-02</td><td class="priority-high">High</td><td>Concurrent login attempts</td><td>Run an approved load profile representing thousands of simultaneous login attempts.</td><td>Service remains stable and authentication outcomes remain correct at the agreed target load.</td></tr>
+            <tr><td>PERF-03</td><td class="priority-high">High</td><td>Availability target</td><td>Review monitoring or service evidence over the agreed measurement period.</td><td>Availability meets the 99.9% target over a stakeholder-approved measurement window.</td></tr>
+            <tr><td>PERF-04</td><td class="priority-medium">Medium</td><td>Geographic performance</td><td>Measure login access from the agreed geographic locations or regions.</td><td>Page and authentication flow meet agreed regional performance expectations; exact thresholds beyond the page-load target are TBD.</td></tr>
+            <tr><td>PERF-05</td><td class="priority-medium">Medium</td><td>Service or provider failure recovery</td><td>Using approved test conditions, observe user-facing behavior when authentication or a configured identity provider is unavailable.</td><td>Failure is communicated clearly, no false success is shown, and the user has an appropriate retry or support path.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="environment">
+        <h2>4. Test Environments</h2>
+        <p>Environment URLs, build identifiers, browser/version support, test accounts, and security protocols are not supplied in the PRD. The QA and pre-production values below remain placeholders until provided and approved.</p>
+        <table>
+          <thead><tr><th>Environment</th><th>URL / build</th><th>Purpose</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>QA</td><td>TBD</td><td>Functional, integration, accessibility, security-control, and responsive testing</td><td class="status">Not provided</td></tr>
+            <tr><td>Pre-production</td><td>TBD</td><td>Release-candidate regression, performance, and readiness validation</td><td class="status">Not provided</td></tr>
+          </tbody>
+        </table>
+        <h3>Environment dimensions to confirm</h3>
+        <ul>
+          <li>Supported operating systems, browsers, and versions.</li>
+          <li>Desktop, tablet, and mobile device models or viewport sizes; touch testing capability.</li>
+          <li>Standard-connection profile and any constrained or regional network profiles.</li>
+          <li>Test identities for standard login, Remember Me, recovery, 2FA, SSO, and any enabled social login.</li>
+          <li>Safe email delivery/reset-token access for test accounts and an agreed method for inspecting authentication analytics.</li>
+          <li>Authorized permissions, test data handling, and controls for rate-limit, concurrency, and security validation.</li>
+        </ul>
+      </section>
+
+      <section id="defects">
+        <h2>5. Defect Reporting Procedure</h2>
+        <ol>
+          <li>Record each deviation from the approved PRD or expected user journey in the team-approved defect tracker (tool: TBD).</li>
+          <li>Include a concise title, environment/build, affected test ID, preconditions, reproducible steps, expected and actual results, impact, and supporting evidence such as a screenshot or relevant approved log.</li>
+          <li>Do not attach real credentials, reset tokens, or other sensitive user data to defects.</li>
+          <li>Assign severity and priority using the project’s agreed definitions; route authentication/security-impacting issues for prompt triage.</li>
+          <li>Track the defect through triage, fix, retest, and regression. Link the retest result to the original defect.</li>
+          <li>Provide a periodic status summary to stakeholders; update cadence and recipients are TBD.</li>
+        </ol>
+        <p><strong>Defect tracker, severity/priority definitions, owners, escalation contacts, and communication cadence:</strong> TBD by the project team.</p>
+      </section>
+
+      <section id="strategy">
+        <h2>6. Test Strategy</h2>
+        <ol>
+          <li><strong>Requirement review:</strong> Confirm requirement interpretation, feature availability, acceptance thresholds, and ambiguities. Maintain traceability from each PRD capability to the scenarios in this plan.</li>
+          <li><strong>Test design:</strong> Apply equivalence partitioning and boundary-value analysis to email/password inputs and configured timeout/token boundaries; decision tables to combinations of credentials, Remember Me, and enabled authentication factors; state transitions to login, reset, and session lifecycles; and use-case testing to end-to-end user journeys. Use error guessing and exploratory testing for recovery and feedback behavior.</li>
+          <li><strong>Smoke testing:</strong> Verify page availability, essential form behavior, valid login, failure handling, and dashboard transition. If smoke tests fail, report the build as not ready for deeper execution and await a stable build.</li>
+          <li><strong>Functional and integration testing:</strong> Execute the scenarios in Section 3 across enabled capabilities, including registration/support links, identity-provider handoffs, and login analytics.</li>
+          <li><strong>Accessibility and compatibility:</strong> Check keyboard and assistive-technology behavior, contrast, responsive layouts, and the product’s confirmed supported browsers/devices.</li>
+          <li><strong>Security validation:</strong> Verify security requirements in an authorized environment and coordinate any rate-limit or session tests with the environment owner. Validate implementation evidence for storage and compliance claims where black-box checks are insufficient.</li>
+          <li><strong>Non-functional testing:</strong> Measure page-load time, concurrency, geographic behavior, and availability using approved test profiles and measurement windows.</li>
+          <li><strong>Regression and retesting:</strong> Retest fixes and execute regression on impacted authentication, recovery, session, accessibility, integration, and performance behavior.</li>
+          <li><strong>Exploratory and end-to-end testing:</strong> Explore realistic new- and returning-user flows, including error recovery and successful dashboard access.</li>
+        </ol>
+        <div class="callout warning">
+          <strong>Safe execution:</strong> Performance, rate-limit, and security validation must use authorized test accounts and an approved environment/load profile. Do not direct high-volume or disruptive tests at production without explicit authorization.
+        </div>
+      </section>
+
+      <section id="schedule">
+        <h2>7. Test Schedule</h2>
+        <p>The PRD does not specify release dates, sprint duration, or staffing. Dates and durations are therefore TBD and should be baselined by the project team.</p>
+        <table>
+          <thead><tr><th>Activity</th><th>Planned timing</th><th>Completion evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Requirement review and test-plan approval</td><td>TBD</td><td>Approved test plan and clarified requirement questions</td></tr>
+            <tr><td>Test scenario/case preparation</td><td>TBD</td><td>Reviewed test scenarios and data/environment needs</td></tr>
+            <tr><td>Environment and account readiness</td><td>TBD</td><td>QA/pre-production access, build, accounts, and integrations confirmed</td></tr>
+            <tr><td>Smoke and functional/integration execution</td><td>TBD</td><td>Execution results and defect records</td></tr>
+            <tr><td>Accessibility, security-control, and compatibility checks</td><td>TBD</td><td>Findings, evidence, and unresolved-risk review</td></tr>
+            <tr><td>Performance and availability validation</td><td>TBD</td><td>Results against approved target profiles/windows</td></tr>
+            <tr><td>Fix verification and regression</td><td>TBD</td><td>Retest results and final regression status</td></tr>
+            <tr><td>Test summary and release recommendation</td><td>TBD</td><td>Approved closure summary and open-risk disposition</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="deliverables">
+        <h2>8. Test Deliverables</h2>
+        <ul>
+          <li>This test plan, reviewed and approved.</li>
+          <li>Detailed test scenarios/cases and requirement-to-test traceability.</li>
+          <li>Environment and test-data readiness record.</li>
+          <li>Execution results, evidence, and defect records.</li>
+          <li>Accessibility, security-control, performance, and compatibility findings as applicable.</li>
+          <li>Retest/regression results and final test summary with open risks and release recommendation.</li>
+        </ul>
+      </section>
+
+      <section id="criteria">
+        <h2>9. Entry and Exit Criteria</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3>Requirement analysis</h3>
+            <p><strong>Entry:</strong> The PRD and relevant product details are available to QA.</p>
+            <p><strong>Exit:</strong> Requirements are reviewed; testable acceptance criteria, feature status, and open questions are recorded; material ambiguities have owners.</p>
+          </div>
+          <div class="card">
+            <h3>Test design</h3>
+            <p><strong>Entry:</strong> Requirement review has started and the login scope is identified.</p>
+            <p><strong>Exit:</strong> Scenarios, priorities, traceability, test data, and environment needs are prepared and approved by the designated stakeholders.</p>
+          </div>
+          <div class="card">
+            <h3>Test execution</h3>
+            <p><strong>Entry:</strong> Candidate application is available; required test accounts and environments are accessible; smoke test passes; test cases and execution rules are approved.</p>
+            <p><strong>Exit:</strong> Planned cases are executed or explicitly dispositioned; results and defects are recorded; critical authentication/security failures are resolved or formally accepted; target results are documented.</p>
+          </div>
+          <div class="card">
+            <h3>Test closure</h3>
+            <p><strong>Entry:</strong> Execution and retesting are complete or stopped by an agreed release decision; defect and test reports are available.</p>
+            <p><strong>Exit:</strong> Test summary, residual risks, requirement coverage, unresolved defects, and release recommendation are reviewed by the responsible stakeholders.</p>
+          </div>
+        </div>
+        <div class="callout warning">
+          <strong>Release-target interpretation:</strong> Numerical targets (95% login success, 90% satisfaction, 20% support-ticket reduction, 99.9% uptime, and under-2-second page load) need agreed measurement periods, sample sizes, baselines, and data sources before they can be used as objective pass/fail gates.
+        </div>
+      </section>
+
+      <section id="execution">
+        <h2>10. Test Execution and Closure</h2>
+        <h3>Execution approach</h3>
+        <ul>
+          <li>Run smoke checks on each candidate build before in-depth validation.</li>
+          <li>Execute high-priority login, recovery, and session cases first, followed by enabled optional identity flows, UX/accessibility, integrations, and non-functional checks.</li>
+          <li>Record each result as Pass, Fail, Blocked, or Not Applicable, with evidence and linked defect where appropriate.</li>
+          <li>Repeat impacted tests after fixes; run the agreed regression set before closure.</li>
+          <li>Report blockers and security-impacting failures promptly through the agreed escalation path.</li>
+        </ul>
+        <h3>Closure summary content</h3>
+        <p>Report build/environment, execution totals by result and priority, requirement coverage, defects by agreed severity, retest/regression status, performance/security/accessibility outcomes, unmet targets, accepted risks, and the release recommendation.</p>
+      </section>
+
+      <section id="tools">
+        <h2>11. Tools and Roles</h2>
+        <table>
+          <thead><tr><th>Need</th><th>Tool / owner</th></tr></thead>
+          <tbody>
+            <tr><td>Defect tracking</td><td>TBD</td></tr>
+            <tr><td>Test-case and execution tracking</td><td>TBD</td></tr>
+            <tr><td>Browser/device and assistive-technology coverage</td><td>TBD, aligned to supported product matrix</td></tr>
+            <tr><td>Performance/load measurement</td><td>TBD, approved for the target environment</td></tr>
+            <tr><td>Analytics and service-availability evidence</td><td>TBD, with access approved by the owning team</td></tr>
+            <tr><td>Project QA, product, engineering, security, and operations contacts</td><td>Names and responsibilities TBD</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="risks">
+        <h2>12. Risks and Mitigations</h2>
+        <table>
+          <thead><tr><th>Risk</th><th>Potential impact</th><th>Mitigation / action</th></tr></thead>
+          <tbody>
+            <tr><td>PRD does not distinguish implemented, optional, and future features.</td><td>Coverage gaps or invalid failures for unavailable capabilities.</td><td>Product owner confirms release scope and feature flags before execution; track conditional coverage explicitly.</td></tr>
+            <tr><td>Environment URLs, supported platforms, and accounts are not defined.</td><td>Blocked or incomplete functional, compatibility, and integration testing.</td><td>Provide QA/pre-production access, approved platform matrix, test users, and safe recovery/identity-provider setup before test entry.</td></tr>
+            <tr><td>Performance and business KPIs lack measurement definitions.</td><td>Results may not be comparable or actionable.</td><td>Agree measurement window, percentiles, sample size, baseline, and event/data source before acceptance decisions.</td></tr>
+            <tr><td>Rate-limit, concurrency, or security tests affect shared services.</td><td>Service disruption or invalid production activity.</td><td>Use only authorized environments, accounts, load profiles, schedules, and owner-approved limits.</td></tr>
+            <tr><td>External identity provider or email delivery dependency is unavailable.</td><td>Recovery and SSO coverage may be blocked.</td><td>Confirm provider/test-tenant and email access readiness; record blocked cases and dependency owner.</td></tr>
+            <tr><td>Insufficient time or resource availability.</td><td>Reduced coverage and unverified residual risk.</td><td>Prioritize authentication, recovery, and security controls; make coverage trade-offs and residual risks visible to stakeholders.</td></tr>
+            <tr><td>Authentication failures are not sufficiently actionable or reveal excess detail.</td><td>Reduced user success or sensitive information exposure.</td><td>Review error behavior for clarity and safe information disclosure; report high-impact deviations promptly.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="approvals">
+        <h2>13. Approvals</h2>
+        <p>Testing proceeds to formal execution after the appropriate stakeholders approve scope, acceptance criteria, environment readiness, and this plan.</p>
+        <table>
+          <thead><tr><th>Role</th><th>Name</th><th>Decision</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr><td>Product owner</td><td>TBD</td><td>Pending</td><td>TBD</td></tr>
+            <tr><td>QA / test lead</td><td>TBD</td><td>Pending</td><td>TBD</td></tr>
+            <tr><td>Engineering representative</td><td>TBD</td><td>Pending</td><td>TBD</td></tr>
+            <tr><td>Security / compliance representative</td><td>TBD</td><td>Pending</td><td>TBD</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <footer>
+      Prepared from the user-provided VWO Login Dashboard PRD and the supplied testplan-creator skill template. Items marked TBD require project-team confirmation; they are not assumed product behavior.
+    </footer>
+  </div>
+</body>
+</html>
